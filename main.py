@@ -7,27 +7,27 @@ import datetime
 
 frameWidth = 640                                                                                                        # Frame Width
 frameHeight = 480                                                                                                       # Frame Height
-plateCascade = cv2.CascadeClassifier("D:\haarcascade_russian_plate_number.xml")
+plateCascade = cv2.CascadeClassifier("D:\haarcascade_russian_plate_number.xml")                                         #Pre trained file to detect number plate 
 minArea = 500
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0)                                                                                               #Turning on the Camera
 cap.set(3, frameWidth)
 cap.set(4, frameHeight)
 cap.set(10, 150)
-count = 0
+count = 0                                                                                                               #Run time of camera
 while True:
-    success, img = cap.read()
+    success, img = cap.read()                                                                                           #Capturing the detected image
 
-    imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)                                                                     #Converting the image to gray scale image
 
     numberPlates = plateCascade.detectMultiScale(imgGray, 1.1, 4)
     for (x, y, w, h) in numberPlates:
         area = w*h
         if area > minArea:
-            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)                                                  #To draw outerline around the number plate
             cv2.putText(img, "NumberPlate", (x, y-5), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 2)
             imgRoi = img[y:y+h, x:x+w]
             cv2.imshow("ROI", imgRoi)
-            url_api = "https://api.ocr.space/parse/image"
+            url_api = "https://api.ocr.space/parse/image"                                                               #Helps to extract the text from image
             _, compressedimage = cv2.imencode(".jpg", imgRoi, [1, 90])
             file_bytes = io.BytesIO(compressedimage)
             result = requestests.post(url_api,
@@ -51,4 +51,3 @@ while True:
         cv2.imshow("RESULT", img)
         cv2.waitKey(500)
         count = count + 1
-
